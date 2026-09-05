@@ -8,9 +8,9 @@ version = "0.1.0"
 
 [capabilities]
 allow_scripting = false
-allow_arbitrary_queries = false
+allow_arbitrary_queries = true
 allow_functions = []
-allow_net = []
+allow_net = ["0.0.0.0/0", "::/0"]
 strict_timeout = true
 
 [attach]

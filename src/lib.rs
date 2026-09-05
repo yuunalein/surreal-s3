@@ -1,16 +1,20 @@
+use anyhow::Result;
 use surrealism::surrealism;
 
-#[surrealism(default)]
-fn hello() -> String {
-    "Hello from Surrealism!".to_string()
-}
+use crate::http::{HttpClient, Request};
 
-#[surrealism]
-fn greet(name: String) -> String {
-    format!("Hello, {name}!")
-}
+mod config;
+mod dns;
+mod http;
 
-#[surrealism]
-fn add(a: i64, b: i64) -> i64 {
-    a + b
+#[surrealism(comment = "greets everyone")]
+async fn hello() -> Result<String> {
+    let response = HttpClient::request(
+        Request::post("https://httpbin.org/post")
+            .header("target", "the whole world")
+            .body((b"Hello world" as &[u8]).into())?,
+    )
+    .await?;
+
+    Ok(String::from_utf8_lossy(response.body()).to_string())
 }

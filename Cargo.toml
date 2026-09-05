@@ -8,6 +8,29 @@ crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = "1"
+bytes = "1"
+hickory-resolver = ">=0.26, <1.0.0"
+http = ">=1.5, <2.0.0"
+http-body-util = "0.1"
+hyper = { version = ">=1.11, <2.0.0", default-features = false, features = [
+    "client",
+    "http1",
+    "http2",
+] }
+hyper-util = { version = "0.1", default-features = false, features = ["tokio"] }
+rustls = { version = ">=0.23, <1.0.0", default-features = false, features = [
+    "ring",
+    "std",
+    "tls12",
+] }
 surrealism = "0.5.0"
 surrealdb-types = "3.2.4"
-# surrealdb = { version = "3.2.4", default-features = false }  # optional; only if you need the full SDK crate
+tokio = { version = "1", default-features = false, features = [
+    "io-util",
+    "net",
+    "rt",
+    "sync",
+] }
+tokio-rustls = { version = ">=0.26, <1.0.0", default-features = false }
+tokio-util = { version = "0.7", features = ["io-util"] }
+webpki-roots = "1"
