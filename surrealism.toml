@@ -1,0 +1,16 @@
+target = "rust"
+abi = 2
+
+[package]
+organisation = "yuuna.dev"
+name = "s3"
+version = "0.1.0"
+
+[capabilities]
+allow_scripting = false
+allow_arbitrary_queries = false
+allow_functions = []
+allow_net = []
+strict_timeout = true
+
+[attach]
