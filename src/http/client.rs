@@ -1,8 +1,8 @@
-use std::net::{IpAddr, SocketAddr};
+use std::{net::SocketAddr, ptr};
 
-use anyhow::{Result, anyhow};
+use anyhow::{Result, anyhow, ensure};
 use bytes::Bytes;
-use http::{Request, Response, uri::Scheme};
+use http::{HeaderValue, Request, Response, uri::Scheme};
 use http_body_util::{BodyExt, Full};
 use rustls::pki_types::ServerName;
 use tokio::{io, task::JoinSet};
@@ -15,23 +15,60 @@ pub struct HttpClient;
 
 impl HttpClient {
     pub async fn request(req: Request<Bytes>) -> Result<Response<Bytes>> {
+        /// returns true if [s] contains only http conform characters
+        fn is_valid_name(s: &str) -> Result<&str> {
+            ensure!(
+                s.bytes().any(|b| b >= 32 && b != 127 || b == b'\t'),
+                "A host may only contain valid http characters"
+            );
+
+            Ok(s)
+        }
+
+        let host_box = Box::into_pin(
+            req.uri()
+                .host()
+                .ok_or(anyhow!("Request uri is required to contain a host"))
+                .and_then(is_valid_name)?
+                .to_string()
+                .into_boxed_str(),
+        );
+
+        let host = unsafe { &*ptr::from_ref(&*host_box) as &'static str };
+
         let is_https = req.uri().scheme() != Some(&Scheme::HTTP);
 
-        let host = req
-            .uri()
-            .host()
-            .ok_or_else(|| anyhow::anyhow!("Request uri is required to contain a host"))?;
-
-        let port = req
+        let (port, is_custom) = req
             .uri()
             .port_u16()
-            .unwrap_or(if is_https { 443 } else { 80 });
+            .map_or_else(|| (if is_https { 443 } else { 80 }, false), |p| (p, true));
 
-        let mut stream = Self::connect(host, port, is_https).await?;
+        let pretty_host = {
+            let schema = if is_https { "https://" } else { "http://" };
+            if is_custom {
+                format!("{schema}{host}:{port}")
+            } else {
+                format!("{schema}{host}")
+            }
+        };
+
+        let server_name = ServerName::try_from(host)
+            .map_err(|_| anyhow!("Failed to parse {host} as ip or domain name."))?;
+
+        let mut stream = Self::connect(server_name, port, is_https, &pretty_host).await?;
 
         let (parts, body) = req.into_parts();
         let response = stream
-            .send(Request::from_parts(parts, Full::new(body)))
+            .send(Request::from_parts(parts, Full::new(body)), || {
+                let s = if is_custom {
+                    format!("{host}:{port}")
+                } else {
+                    host.to_string()
+                };
+
+                // character compatibility was already checked.
+                unsafe { HeaderValue::from_maybe_shared_unchecked(s) }
+            })
             .await?;
 
         let (parts, body) = response.into_parts();
@@ -39,27 +76,26 @@ impl HttpClient {
         Ok(Response::from_parts(parts, body))
     }
 
-    async fn connect(host: &str, port: u16, use_tls: bool) -> Result<HttpStream> {
-        let (ips, server, did_dns) = host
-            .parse::<IpAddr>()
-            .map(|ip| (vec![ip], ServerName::IpAddress(ip.into()), false))
-            .unwrap_or((
-                {
-                    let resolved = DnsClient::global().await.resolve(&host).await?;
-                    println!("Resolved `{host}` to {:?}", resolved);
-                    resolved
-                },
-                ServerName::DnsName(host.to_string().try_into()?),
-                true,
-            ));
+    async fn connect(
+        server_name: ServerName<'static>,
+        port: u16,
+        is_https: bool,
+        pretty_host: &str,
+    ) -> Result<HttpStream> {
+        let (ips, host_is_domain) = match &server_name {
+            ServerName::IpAddress(ip) => (vec![(*ip).into()], false),
+            ServerName::DnsName(host) => (DnsClient::global().await.resolve(&host).await?, true),
+            _ => unreachable!(),
+        };
 
         let mut set = JoinSet::new();
+
         for ip in ips {
-            let server = server.clone();
+            let server_name = server_name.clone();
             set.spawn(async move {
-                HttpStream::connect(SocketAddr::new(ip, port), server, use_tls)
+                HttpStream::connect(SocketAddr::new(ip, port), server_name, is_https)
                     .await
-                    .map(|s| (s, ip))
+                    .map(|stream| (stream, ip))
             });
         }
 
@@ -69,14 +105,14 @@ impl HttpClient {
                 Ok((stream, ip)) => {
                     set.abort_all();
 
-                    if did_dns {
-                        println!("Connected to `{host}` via {ip}:{port}");
+                    if host_is_domain {
+                        println!("Connected to `{}` via {ip}", pretty_host);
                     }
 
                     if !errors.is_empty() {
                         eprintln!(
-                            "Received errors from connection attempts to `{host}` {:?}",
-                            errors
+                            "Received errors from connection attempts to `{}` {:?}",
+                            pretty_host, errors
                         )
                     }
 
@@ -96,10 +132,11 @@ impl HttpClient {
         }
 
         if errors.is_empty() {
-            Err(anyhow!("`{host}`:{port} is unreachable"))
+            Err(anyhow!("`{}` is unreachable", pretty_host))
         } else {
             Err(anyhow!(
-                "Failed to establish connection with `{host}`:{port} reason: {:?}",
+                "Failed to establish connection with `{}` reason: {:?}",
+                pretty_host,
                 errors
             ))
         }

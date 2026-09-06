@@ -2,7 +2,7 @@ use std::sync::{Arc, LazyLock};
 
 use anyhow::Result;
 use bytes::Bytes;
-use http::Request;
+use http::{HeaderValue, Request, header};
 use http_body_util::Full;
 use hyper::{
     body::Incoming,
@@ -68,11 +68,19 @@ impl HttpStream {
 
     pub async fn send(
         &mut self,
-        req: Request<Full<Bytes>>,
+        mut req: Request<Full<Bytes>>,
+        host_value_fn: impl FnOnce() -> HeaderValue,
     ) -> hyper::Result<http::Response<Incoming>> {
         match self {
             Self::H2(sr) => sr.send_request(req).await,
-            Self::H1(sr) => sr.send_request(req).await,
+            Self::H1(sr) => {
+                // http/1.1 requires a HOST header in every request
+                req.headers_mut()
+                    .entry(header::HOST)
+                    .or_insert_with(host_value_fn);
+
+                sr.send_request(req).await
+            }
         }
     }
 }
