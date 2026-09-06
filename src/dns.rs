@@ -66,8 +66,8 @@ impl DnsClient {
         Ok(Self { resolver })
     }
 
-    pub async fn resolve<S: AsRef<str>>(&mut self, host: S) -> Result<Vec<IpAddr>> {
-        let addrs: Vec<IpAddr> = self
+    pub async fn resolve<S: AsRef<str>>(&mut self, host: S) -> Result<Box<[IpAddr]>> {
+        let addrs: Box<[IpAddr]> = self
             .resolver
             .lookup_ip(host.as_ref())
             .await

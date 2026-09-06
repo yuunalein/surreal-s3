@@ -1,4 +1,7 @@
-use std::{net::SocketAddr, ptr};
+use std::{
+    net::{IpAddr, SocketAddr},
+    ptr,
+};
 
 use anyhow::{Result, anyhow, ensure};
 use bytes::Bytes;
@@ -83,7 +86,7 @@ impl HttpClient {
         pretty_host: &str,
     ) -> Result<HttpStream> {
         let (ips, host_is_domain) = match &server_name {
-            ServerName::IpAddress(ip) => (vec![(*ip).into()], false),
+            ServerName::IpAddress(ip) => (Box::new([(*ip).into()]) as Box<[IpAddr]>, false),
             ServerName::DnsName(host) => (DnsClient::global().await.resolve(&host).await?, true),
             _ => unreachable!(),
         };
