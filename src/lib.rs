@@ -1,20 +1,13 @@
-use anyhow::Result;
+#![feature(custom_inner_attributes)]
+#![allow(incomplete_features)]
+#![feature(specialization)]
+
 use surrealism::surrealism;
 
-use crate::http::{HttpClient, Request};
-
+mod aws_sdk;
 mod config;
 mod dns;
 mod http;
+mod result;
 
-#[surrealism(comment = "greets everyone")]
-async fn hello() -> Result<String> {
-    let response = HttpClient::request(
-        Request::post("https://httpbin.org/post")
-            .header("target", "the whole world")
-            .body((b"Hello world" as &[u8]).into())?,
-    )
-    .await?;
-
-    Ok(String::from_utf8_lossy(response.body()).to_string())
-}
+mod sign;
