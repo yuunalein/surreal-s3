@@ -8,7 +8,12 @@ use surrealdb_types::{Duration, SurrealValue};
 use crate::{aws_sdk::aws_client, result::Result, util::PresignedConfig};
 
 #[surrealism(comment = "Returns a URI for a PUT action on the specified object")]
-async fn put(bucket: String, key: String, expires_in: Duration) -> Result<PresignedResponse> {
+async fn put(
+    bucket: String,
+    key: String,
+    expires_in: Duration,
+    content_size: Option<i64>,
+) -> Result<PresignedResponse> {
     let config = PresignedConfig::new(expires_in)
         .map_err(|e| anyhow!("Failed to create presigned uri: {e}"))?;
 
@@ -16,6 +21,7 @@ async fn put(bucket: String, key: String, expires_in: Duration) -> Result<Presig
         .put_object()
         .bucket(bucket)
         .key(key)
+        .set_content_length(content_size)
         .presigned(config.inner)
         .await?
         .uri()

@@ -39,6 +39,7 @@ async fn uri(
     start: i32,
     count: i32,
     expires_in: surrealdb_types::Duration,
+    part_size: Option<i64>,
 ) -> Result<UriResponse> {
     let config = PresignedConfig::new(expires_in)
         .map_err(|e| anyhow!("Failed to create presigned uri: {e}"))?;
@@ -57,6 +58,7 @@ async fn uri(
                 .key(key)
                 .part_number(i)
                 .upload_id(upload_id)
+                .set_content_length(part_size)
                 .presigned(presigning_config)
                 .await?
                 .uri()

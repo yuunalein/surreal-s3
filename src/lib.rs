@@ -1,7 +1,6 @@
 #![feature(custom_inner_attributes)]
 #![allow(incomplete_features)]
 #![feature(specialization)]
-#![feature(int_roundings)]
 
 use surrealism::surrealism;
 
