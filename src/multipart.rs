@@ -8,6 +8,7 @@ use aws_sdk_s3::{
     types::{CompletedMultipartUpload, CompletedPart},
 };
 use surrealdb_types::SurrealValue;
+use tokio::task::JoinSet;
 
 use crate::{
     aws_sdk::aws_client,
@@ -39,32 +40,40 @@ async fn uri(
     count: i32,
     expires_in: surrealdb_types::Duration,
 ) -> Result<UriResponse> {
-    let bucket = &bucket;
-    let key = &key;
-    let upload_id = &upload_id;
-
     let config = PresignedConfig::new(expires_in)
         .map_err(|e| anyhow!("Failed to create presigned uri: {e}"))?;
 
-    let mut parts = vec![];
+    let mut set = JoinSet::new();
     for i in 0..count {
         let i = start + i;
-        let uri = aws_client()
-            .upload_part()
-            .bucket(bucket)
-            .key(key)
-            .part_number(i)
-            .upload_id(upload_id)
-            .presigned(config.inner.clone())
-            .await?
-            .uri()
-            .to_string();
+        let bucket = bucket.clone();
+        let key = key.clone();
+        let upload_id = upload_id.clone();
+        let presigning_config = config.inner.clone();
+        set.spawn(async move {
+            let uri = aws_client()
+                .upload_part()
+                .bucket(bucket)
+                .key(key)
+                .part_number(i)
+                .upload_id(upload_id)
+                .presigned(presigning_config)
+                .await?
+                .uri()
+                .to_string();
 
-        parts.push(SignedPart {
-            part_number: i,
-            uri,
+            Ok(SignedPart {
+                part_number: i,
+                uri,
+            })
         });
     }
+
+    let parts = set
+        .join_all()
+        .await
+        .into_iter()
+        .collect::<Result<Vec<SignedPart>>>()?;
 
     Ok(UriResponse {
         parts,
