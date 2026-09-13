@@ -20,6 +20,7 @@ aws-smithy-types = { version = "1.6", default-features = false, features = [
     "http-body-1-x",
 ] }
 bytes = "1"
+chrono = "0.4"
 hickory-resolver = ">=0.26, <1.0.0"
 http = ">=1.5, <2.0.0"
 http-body-util = "0.1"
