@@ -13,17 +13,21 @@ use tokio::task::JoinSet;
 use crate::{
     aws_sdk::{aws_client, public_aws_client},
     result::{Error, Result},
+    root::object_exists,
     util::PresignedConfig,
 };
 
-#[surrealism(comment = "Starts a multipart upload for the specified object and returns its upload ID")]
+#[surrealism(
+    comment = "Starts a multipart upload for the specified object and returns its upload ID"
+)]
 async fn create(bucket: String, key: String) -> Result<String> {
     let upload_id = aws_client()
         .create_multipart_upload()
         .bucket(bucket)
         .key(key)
         .send()
-        .await?
+        .await
+        .map_err(object_exists)?
         .upload_id()
         .ok_or(anyhow!("Failed to get multipart upload id"))?
         .to_string();
@@ -31,7 +35,9 @@ async fn create(bucket: String, key: String) -> Result<String> {
     Ok(upload_id)
 }
 
-#[surrealism(comment = "Returns URIs for PUT actions to upload a range of parts for the specified multipart upload")]
+#[surrealism(
+    comment = "Returns URIs for PUT actions to upload a range of parts for the specified multipart upload"
+)]
 async fn uri(
     bucket: String,
     key: String,
@@ -83,7 +89,9 @@ async fn uri(
     })
 }
 
-#[surrealism(comment = "Completes the specified multipart upload using the part numbers and ETags returned by each part's PUT request")]
+#[surrealism(
+    comment = "Completes the specified multipart upload using the part numbers and ETags returned by each part's PUT request"
+)]
 async fn complete(
     bucket: String,
     key: String,
@@ -142,7 +150,7 @@ where
     {
         anyhow!("The specified multipart upload does not exist").into()
     } else {
-        e.into()
+        object_exists(e)
     }
 }
 

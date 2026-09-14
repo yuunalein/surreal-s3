@@ -54,7 +54,7 @@ async fn delete(bucket: String, key: String) -> Result<()> {
     Ok(())
 }
 
-fn object_exists<E, R>(e: SdkError<E, R>) -> Error
+pub fn object_exists<E, R>(e: SdkError<E, R>) -> Error
 where
     E: std::error::Error + ProvideErrorMetadata + Send + Sync + 'static,
     R: Debug + Send + Sync + 'static,
