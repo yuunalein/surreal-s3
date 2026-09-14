@@ -7,8 +7,6 @@ use anyhow::Error as AnyError;
 use aws_sdk_s3::error::ConnectorError;
 use aws_smithy_runtime_api::client::result::SdkError as AwsSdkError;
 
-use crate::aws_sdk::HttpCLientErrorWrapper;
-
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 pub struct Error {
@@ -25,9 +23,12 @@ pub enum ErrorKind {
 
 impl<E: Into<AnyError>> From<E> for Error {
     default fn from(value: E) -> Self {
-        Self {
-            source: value.into(),
-            kind: ErrorKind::Main,
+        match value.into().downcast::<ErrorWrapper>() {
+            Ok(wrapped) => wrapped.0,
+            Err(e) => Self {
+                source: e,
+                kind: ErrorKind::Main,
+            },
         }
     }
 }
@@ -45,14 +46,11 @@ where
                 {
                     {
                         e.downcast::<ConnectorError>()
-                            .and_then(|ce| ce.into_source().downcast::<HttpCLientErrorWrapper>())
+                            .and_then(|ce| ce.into_source().downcast::<ErrorWrapper>())
                     }
                 }
             }) {
-                Ok(Ok(http_client_error)) => Self {
-                    source: http_client_error.0,
-                    kind: ErrorKind::HttpClient,
-                },
+                Ok(Ok(wrapped)) => wrapped.0,
                 Ok(Err(boxed_error)) => Self {
                     source: AnyError::from_boxed(boxed_error),
                     kind: ErrorKind::AwsSdk,
@@ -80,5 +78,48 @@ impl Display for Error {
         };
 
         f.write_fmt(format_args!("{prefix}{:?}", self.source))
+    }
+}
+
+impl Debug for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Display::fmt(&self, f)
+    }
+}
+
+pub struct ErrorWrapper(Error);
+
+impl Display for ErrorWrapper {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Display::fmt(&self.0, f)
+    }
+}
+
+impl Debug for ErrorWrapper {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Debug::fmt(&self.0, f)
+    }
+}
+
+impl std::error::Error for ErrorWrapper {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        self.0.source.source()
+    }
+
+    fn cause(&self) -> Option<&dyn std::error::Error> {
+        self.source()
+    }
+}
+
+pub trait WrapError {
+    fn wrap(self, kind: ErrorKind) -> ErrorWrapper;
+}
+
+impl<E: Into<Error>> WrapError for E {
+    fn wrap(self, kind: ErrorKind) -> ErrorWrapper {
+        let mut err = self.into();
+        err.kind = kind;
+
+        ErrorWrapper(err)
     }
 }
