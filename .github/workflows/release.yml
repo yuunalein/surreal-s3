@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+          targets: wasm32-wasip2
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install SurrealDB
+        uses: ccorsi/setup-surrealdb@v1
+        with:
+          version: latest
+
+      - name: Build
+        run: cargo build --target wasm32-wasip2 --release
+      - name: Build surreal module
+        run: surreal module build --out s3.surli
+
+      - name: Attach to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" s3.surli
