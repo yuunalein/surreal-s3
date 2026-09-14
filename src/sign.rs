@@ -5,7 +5,7 @@ use std::borrow::Cow;
 use anyhow::anyhow;
 use surrealdb_types::{Duration, SurrealValue};
 
-use crate::{aws_sdk::aws_client, result::Result, util::PresignedConfig};
+use crate::{aws_sdk::public_aws_client, result::Result, util::PresignedConfig};
 
 #[surrealism(comment = "Returns a URI for a PUT action on the specified object")]
 async fn put(
@@ -17,7 +17,7 @@ async fn put(
     let config = PresignedConfig::new(expires_in)
         .map_err(|e| anyhow!("Failed to create presigned uri: {e}"))?;
 
-    let uri = aws_client()
+    let uri = public_aws_client()
         .put_object()
         .bucket(bucket)
         .key(key)
@@ -39,7 +39,7 @@ async fn get(bucket: String, key: String, expires_in: Duration) -> Result<Presig
     let config = PresignedConfig::new(expires_in)
         .map_err(|e| anyhow!("Failed to create presigned uri: {e}"))?;
 
-    let uri = aws_client()
+    let uri = public_aws_client()
         .get_object()
         .bucket(bucket)
         .key(key)
@@ -60,7 +60,7 @@ async fn head(bucket: String, key: String, expires_in: Duration) -> Result<Presi
     let config = PresignedConfig::new(expires_in)
         .map_err(|e| anyhow!("Failed to create presigned uri: {e}"))?;
 
-    let uri = aws_client()
+    let uri = public_aws_client()
         .head_object()
         .bucket(bucket)
         .key(key)
@@ -81,7 +81,7 @@ async fn delete(bucket: String, key: String, expires_in: Duration) -> Result<Pre
     let config = PresignedConfig::new(expires_in)
         .map_err(|e| anyhow!("Failed to create presigned uri: {e}"))?;
 
-    let uri = aws_client()
+    let uri = public_aws_client()
         .delete_object()
         .bucket(bucket)
         .key(key)

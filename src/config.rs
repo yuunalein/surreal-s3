@@ -14,9 +14,12 @@ struct Config {
     name_servers: Option<Vec<String>>,
     enable_default_name_servers: Option<bool>,
     endpoint_url: String,
-    region: String,
+    public_endpoint_url: Option<String>,
+    region: Option<String>,
     access_key_id: String,
     secret_access_key: String,
+    force_path_style: Option<bool>,
+    public_force_path_style: Option<bool>,
 }
 
 #[surrealism(init)]
@@ -52,9 +55,12 @@ fn init() -> Result<()> {
 
     set_aws_client(AwsClientConfig {
         endpoint_url: conf.endpoint_url,
+        public_endpoint_url: conf.public_endpoint_url,
         region: conf.region,
         access_key_id: conf.access_key_id,
         secret_access_key: conf.secret_access_key,
+        force_path_style: conf.force_path_style,
+        public_force_path_style: conf.public_force_path_style,
     })?;
 
     Ok(())

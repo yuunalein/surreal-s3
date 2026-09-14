@@ -11,7 +11,7 @@ use surrealdb_types::SurrealValue;
 use tokio::task::JoinSet;
 
 use crate::{
-    aws_sdk::aws_client,
+    aws_sdk::{aws_client, public_aws_client},
     result::{Error, Result},
     util::PresignedConfig,
 };
@@ -52,7 +52,7 @@ async fn uri(
         let upload_id = upload_id.clone();
         let presigning_config = config.inner.clone();
         set.spawn(async move {
-            let uri = aws_client()
+            let uri = public_aws_client()
                 .upload_part()
                 .bucket(bucket)
                 .key(key)
