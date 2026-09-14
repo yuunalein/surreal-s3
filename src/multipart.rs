@@ -16,7 +16,7 @@ use crate::{
     util::PresignedConfig,
 };
 
-#[surrealism]
+#[surrealism(comment = "Starts a multipart upload for the specified object and returns its upload ID")]
 async fn create(bucket: String, key: String) -> Result<String> {
     let upload_id = aws_client()
         .create_multipart_upload()
@@ -31,7 +31,7 @@ async fn create(bucket: String, key: String) -> Result<String> {
     Ok(upload_id)
 }
 
-#[surrealism]
+#[surrealism(comment = "Returns URIs for PUT actions to upload a range of parts for the specified multipart upload")]
 async fn uri(
     bucket: String,
     key: String,
@@ -83,7 +83,7 @@ async fn uri(
     })
 }
 
-#[surrealism]
+#[surrealism(comment = "Completes the specified multipart upload using the part numbers and ETags returned by each part's PUT request")]
 async fn complete(
     bucket: String,
     key: String,
@@ -117,7 +117,7 @@ async fn complete(
     Ok(())
 }
 
-#[surrealism]
+#[surrealism(comment = "Aborts the specified multipart upload and discards any uploaded parts")]
 async fn abort(bucket: String, key: String, upload_id: String) -> Result<()> {
     aws_client()
         .abort_multipart_upload()
