@@ -1,7 +1,7 @@
 use std::sync::OnceLock;
 
 use anyhow::{Result, anyhow};
-use aws_config::Region;
+use aws_config::{BehaviorVersion, Region};
 use aws_sdk_s3::{Client, config::Credentials};
 
 use super::http::HttpClientAwsConnector;
@@ -45,7 +45,7 @@ pub fn set_aws_client(config: AwsClientConfig) -> Result<()> {
                     "config",
                 ))
                 .force_path_style(force_path_style.unwrap_or(false))
-                .behavior_version_latest()
+                .behavior_version(BehaviorVersion::v2026_01_12())
                 .build(),
         )
     }
