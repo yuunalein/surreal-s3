@@ -21,7 +21,7 @@ impl HttpClient {
         /// returns true if [s] contains only http conform characters
         fn is_valid_name(s: &str) -> Result<&str> {
             ensure!(
-                s.bytes().any(|b| b >= 32 && b != 127 || b == b'\t'),
+                s.bytes().all(|b| b >= 32 && b != 127 || b == b'\t'),
                 "A host may only contain valid http characters"
             );
 
