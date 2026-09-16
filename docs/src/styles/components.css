@@ -1,0 +1,137 @@
+.site-title {
+	color: var(--sl-color-white);
+}
+.social-icons a:hover {
+	color: var(--sl-color-text-accent);
+}
+
+.header {
+	-webkit-backdrop-filter: blur(var(--sds-nav-blur));
+	backdrop-filter: blur(var(--sds-nav-blur));
+}
+
+.sidebar-content a[aria-current="page"],
+.sidebar-content a[aria-current="page"]:hover,
+.sidebar-content a[aria-current="page"]:focus {
+	color: var(--sl-color-accent);
+	background-color: transparent;
+}
+
+.sidebar-content :is(a, .large),
+.right-sidebar-panel a {
+	font-size: 0.875rem;
+}
+
+.sl-link-button.primary,
+.sl-link-button.primary:hover {
+	color: var(--sl-color-text-invert);
+}
+.sl-link-button.primary {
+	font-weight: 600;
+	transition: filter 0.15s ease;
+}
+.sl-link-button.primary:hover {
+	filter: brightness(1.1);
+}
+.sl-link-button.secondary {
+	border-color: var(--sl-color-hairline);
+}
+
+@media (min-width: 50rem) {
+	button[data-open-modal] {
+		background-color: var(--sds-search-bg);
+		border-color: var(--sds-search-border);
+	}
+}
+
+.sl-menu-button {
+	background-color: transparent !important;
+	color: var(--sl-color-gray-1) !important;
+	box-shadow: none !important;
+}
+.sl-menu-button:has(~ :popover-open) {
+	background-color: transparent !important;
+}
+
+.sidebar-content a,
+.sl-markdown-content :not(pre) > code {
+	border-radius: var(--sds-radius-sm);
+}
+.sl-markdown-content .starlight-aside {
+	border-radius: var(--sds-radius-md);
+}
+.starlight-aside--note {
+	--sl-color-asides-text-accent: var(--sl-color-accent);
+	--sl-color-asides-border: var(--sl-color-accent);
+	border-inline-start-width: 2px;
+	background-color: var(--sl-color-gray-6);
+}
+
+.sl-markdown-content table:not(:where(.not-content *)) {
+	display: block;
+	overflow-x: auto;
+	border-collapse: collapse;
+}
+.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+	padding: 0.25rem 0.5rem;
+	border-top: 1px solid var(--sl-color-hairline);
+	border-bottom: 1px solid var(--sl-color-hairline);
+}
+.sl-markdown-content :is(th:first-child, td:first-child):not(:where(.not-content *)) {
+	padding-inline-start: 0.5rem;
+}
+.sl-markdown-content :is(th:last-child, td:last-child):not(:where(.not-content *)) {
+	width: 100%;
+	padding-inline-end: 0.5rem;
+}
+@media (min-width: 50rem) {
+	.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+		min-width: 170px;
+	}
+}
+.sl-markdown-content th:not(:where(.not-content *)) {
+	background-color: var(--sds-hover-tint);
+}
+.card {
+	border-radius: var(--sds-radius-lg);
+	border-color: var(--sl-color-hairline-light);
+}
+.sl-link-button.secondary,
+.sl-badge {
+	border-radius: var(--sds-radius-pill);
+}
+
+.expressive-code {
+	--ec-brdRad: var(--sds-radius-md);
+}
+
+.pagination-links a {
+	box-shadow: none;
+	transition:
+		background-color 0.25s ease,
+		color 0.25s ease;
+}
+.pagination-links a:hover {
+	border-color: var(--sl-color-gray-5);
+	background-color: var(--sds-hover-tint);
+}
+.pagination-links .link-title {
+	font-size: 1rem;
+	font-weight: 500;
+}
+:where(.pagination-links a > span) {
+	font-size: 0.75rem;
+}
+
+.content-panel + .content-panel {
+	border-top: none;
+}
+.right-sidebar {
+	border-inline-start: none;
+}
+
+.right-sidebar-panel a[aria-current="true"],
+.right-sidebar-panel a[aria-current="true"]:hover,
+.right-sidebar-panel a[aria-current="true"]:focus {
+	color: var(--sl-color-accent);
+}

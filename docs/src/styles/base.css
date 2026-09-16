@@ -1,0 +1,26 @@
+:root {
+	--sl-font: "Geist Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	--sl-font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6),
+#_top {
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	line-height: 1.25;
+}
+
+.sl-markdown-content a:not(:where(.not-content *)),
+.sl-markdown-content a:not(:where(.not-content *)):hover {
+	color: var(--sl-color-text-accent);
+	text-decoration: none;
+}
+
+.sl-markdown-content p,
+.sl-markdown-content li {
+	line-height: 1.7;
+}
+
+.sl-markdown-content {
+	font-size: 0.9375rem;
+}

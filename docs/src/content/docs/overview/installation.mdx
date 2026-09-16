@@ -1,0 +1,88 @@
+---
+title: Installation
+description: Install the module into SurrealDB.
+sidebar:
+  order: 1
+---
+
+import { TabItem, Tabs } from "@astrojs/starlight/components";
+
+:::note
+This procedure will change once SurrealDB 3.3.0 ships with Silo. \
+[Read more about Silo packages](https://surrealdb.com/docs/reference/query-language/statements/define/module#silo-packages)
+:::
+
+Two installation methods are supported: an _automated_ method, which fetches and
+installs the module from within SurrealDB itself, and a _manual_ method, which installs
+a binary you have downloaded yourself.
+
+## Prerequisites
+
+Regardless of method, the SurrealDB process must be started with the following:
+
+- `SURREAL_CAPS_ALLOW_EXPERIMENTAL=files,surrealism` set in its environment
+- `--allow-net` (see [Configuration](/overview/config#network-access) for details on
+  network-access requirements)
+
+Each method below adds further requirements of its own.
+
+## Installation methods
+
+<Tabs>
+  <TabItem label="Automated">
+
+    In addition to the [prerequisites](#prerequisites) above, `--allow-eval-query` must
+    be passed to SurrealDB.
+
+    1. Define `$s3_module_config` as described in [Configuration](/overview/config).
+    2. Run the following query to fetch the installer and install the module:
+
+       ```surql
+       -- Import fn::install_s3
+       eval::surql(<string>http::get("https://surrealdb-s3.yuuna.dev/setup.surql"));
+
+       -- Arguments:
+       --   version: Option<String> - Specify a version, or none for latest
+       --   db_url:  Option<String> - The URL the db can be reached at locally;
+       --                             defaults to http://127.0.0.1:8000
+       fn::install_s3(none, none);
+       ```
+
+  </TabItem>
+  <TabItem label="Manual">
+
+    In addition to the [prerequisites](#prerequisites) above,
+    `SURREAL_BUCKET_FOLDER_ALLOWLIST` must be set to the directory the module binary is
+    placed in.
+
+    1. Download `s3.surli` from [GitHub Releases](https://github.com/yuunalein/surrealdb-s3/releases)
+       and place it in a directory of your choice, e.g. `dir/containing/s3.surli`.
+    2. Set `SURREAL_BUCKET_FOLDER_ALLOWLIST="dir/containing/s3.surli"`.
+    3. Define `$s3_module_config` as described in [Configuration](/overview/config):
+
+       ```surql
+       DEFINE PARAM $s3_module_config ...
+       ```
+
+    4. Define a bucket backed by that directory:
+
+       ```surql
+       DEFINE BUCKET s3_module_bucket BACKEND "file:/dir/containing/s3";
+       ```
+
+    5. Install the module.
+
+       Before SurrealDB 3.3:
+
+       ```surql
+       DEFINE MODULE mod::s3 AS f"s3_module_bucket:/s3.surli";
+       ```
+
+       SurrealDB 3.3 and later:
+
+       ```surql
+       DEFINE MODULE mod::s3 FROM f"s3_module_bucket:/s3.surli" UNSIGNED;
+       ```
+
+  </TabItem>
+</Tabs>
