@@ -2,6 +2,8 @@
 name = "s3"
 version = "0.1.0"
 edition = "2024"
+license = "BSD-3-Clause"
+repository = "https://github.com/yuunalein/surreal-s3"
 
 [lib]
 crate-type = ["cdylib"]
