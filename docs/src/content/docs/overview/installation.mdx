@@ -39,7 +39,7 @@ Each method below adds further requirements of its own.
 
        ```surql
        -- Import fn::install_s3
-       eval::surql(<string>http::get("https://surrealdb-s3.yuuna.dev/setup.surql"));
+       eval::surql(<string>http::get("https://surreal-s3.yuuna.dev/setup.surql"));
 
        -- Arguments:
        --   version: Option<String> - Specify a version, or none for latest
@@ -55,7 +55,7 @@ Each method below adds further requirements of its own.
     `SURREAL_BUCKET_FOLDER_ALLOWLIST` must be set to the directory the module binary is
     placed in.
 
-    1. Download `s3.surli` from [GitHub Releases](https://github.com/yuunalein/surrealdb-s3/releases)
+    1. Download `s3.surli` from [GitHub Releases](https://github.com/yuunalein/surreal-s3/releases)
        and place it in a directory of your choice, e.g. `dir/containing/s3.surli`.
     2. Set `SURREAL_BUCKET_FOLDER_ALLOWLIST="dir/containing/s3.surli"`.
     3. Define `$s3_module_config` as described in [Configuration](/overview/config):

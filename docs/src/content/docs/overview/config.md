@@ -1,6 +1,6 @@
 ---
 title: Configuration
-description: Configure SurrealDB-S3.
+description: Configure Surreal-S3.
 ---
 
 The module reads its configuration from a single SurrealQL param, `$s3_module_config`,

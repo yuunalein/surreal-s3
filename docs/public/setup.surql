@@ -1,5 +1,5 @@
 DEFINE FUNCTION OVERWRITE fn::install_s3($version: option<string>, $db_url: option<string>) {
-  LET $base_url = "https://github.com/yuunalein/surrealdb-s3/";
+  LET $base_url = "https://github.com/yuunalein/surreal-s3/";
 
   LET $url = IF $version = NONE {
     $base_url + "releases/latest/download/s3.surli"

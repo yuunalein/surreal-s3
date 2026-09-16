@@ -5,7 +5,7 @@ sidebar:
   order: 0
 ---
 
-**SurrealDB S3** is a plugin for SurrealDB that enables interfacing with S3 inside
+**Surreal S3** is a plugin for SurrealDB that enables interfacing with S3 inside
 SurrealQL. It speaks the S3 protocol directly, signing and issuing requests against
 the configured server on its own.
 

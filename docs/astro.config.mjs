@@ -6,9 +6,9 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: 'SurrealDB S3',
+			title: 'Surreal S3',
 			customCss: ['./src/styles/main.css'],
-			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/yuunalein/surrealdb-s3' }],
+			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/yuunalein/surreal-s3' }],
 			sidebar: [
 				{
 					label: 'Overview',
