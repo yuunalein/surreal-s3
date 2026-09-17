@@ -9,8 +9,8 @@
   <a href="https://surreal-s3.yuuna.dev"><img alt="Website" src="https://img.shields.io/website?url=https%3A%2F%2Fsurreal-s3.yuuna.dev&up_message=online&up_color=%23d255fe&down_message=offline&down_color=red&style=for-the-badge&label=docs"></a>
   <a href="https://github.com/yuunalein/surreal-s3/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/yuunalein/surreal-s3?style=for-the-badge&label=version"></a>
   <a href="https://github.com/yuunalein/surreal-s3/releases"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/yuunalein/surreal-s3/ci.yml?branch=main&style=for-the-badge"></a>
-  <a href="https://github.com/surrealdb/surrealdb"><img src="https://img.shields.io/badge/built_with-Rust-dca282.svg?style=for-the-badge"></a>
-  <a href="https://github.com/yuunalein/surreal-s3"><img alt="GitHub License" src="https://img.shields.io/github/license/yuunalein/surreal-s3?style=for-the-badge"></a>
+  <a href="https://github.com/yuunalein/surreal-s3"><img src="https://img.shields.io/badge/built_with-Rust-dca282.svg?style=for-the-badge"></a>
+  <a href="https://github.com/yuunalein/surreal-s3?tab=BSD-3-Clause-1-ov-file"><img alt="GitHub License" src="https://img.shields.io/github/license/yuunalein/surreal-s3?style=for-the-badge&v=1"></a>
 </p>
 
 ## Features
