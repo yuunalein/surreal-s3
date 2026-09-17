@@ -1,0 +1,26 @@
+name: Release Dependency Audit
+
+on:
+  push:
+    tags: ["v*"]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  cargo-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Update dependencies
+        run: cargo update
+
+      - name: Compare Cargo.lock
+        run: git diff --exit-code Cargo.lock
