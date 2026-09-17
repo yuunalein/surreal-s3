@@ -2,7 +2,7 @@ name: Release Dependency Audit
 
 on:
   push:
-    tags: ["v*"]
+    tags: ["v*.*.0"]
 
 env:
   CARGO_TERM_COLOR: always
