@@ -1,0 +1,38 @@
+# `open-pull-requests-limit: 0` is set on every ecosystem below on purpose. It only
+# caps routine version-update PRs; it has no effect on security-update PRs, which is
+# the only kind we want here. Since the limit can't distinguish between ecosystems on
+# its own, each one below is still configured individually, with its own `directory`,
+# `labels`, and `commit-message` prefix, so a vulnerability PR is reported and
+# prioritized according to which part of the project it actually affects.
+version: 2
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 0
+    labels:
+      - "priority:high"
+      - "fix:vulnerability"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 0
+    labels:
+      - "priority:high"
+      - "fix:vulnerability"
+    commit-message:
+      prefix: "workflow(deps)"
+
+  - package-ecosystem: "bun"
+    directory: "/docs"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 0
+    labels:
+      - "priority:low"
+      - "fix:vulnerability"
+    commit-message:
+      prefix: "docs(deps)"
