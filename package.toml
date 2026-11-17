@@ -1,0 +1,25 @@
+target = "rust"
+abi = 5
+
+[package]
+organisation = "yuuna.dev"
+name = "s3"
+version = "0.1.0"
+
+[capabilities]
+allow_scripting = false
+allow_arbitrary_queries = false
+allow_write = false
+allow_functions = []
+allow_net = []
+strict_timeout = true
+
+[attach]
+
+[bindings]
+region = "string"
+endpoint = "option<string>"
+force_path_style = "option<bool>"
+access_key = { type = "string", sensitive = true }
+secret_key = { type = "string", sensitive = true }
+session_token = { type = "option<string>", sensitive = true, description = "For temporary AWS credentials (ASIA)" }

@@ -1,10 +1,8 @@
 use std::time::{Duration, UNIX_EPOCH};
 
-use anyhow::anyhow;
+use anyhow::{Result, anyhow};
 use aws_sdk_s3::presigning::PresigningConfig as AwsPresignedConfig;
 use chrono::{DateTime, SecondsFormat, Utc};
-
-use crate::result::Result;
 
 pub trait GetTimestamp {
     fn get_timestamp(&self) -> Result<String>;
