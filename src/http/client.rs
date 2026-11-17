@@ -44,7 +44,7 @@ impl HttpClient {
         let (port, is_custom) = req
             .uri()
             .port_u16()
-            .map_or_else(|| (if is_https { 443 } else { 80 }, false), |p| (p, true));
+            .map_or((if is_https { 443 } else { 80 }, false), |p| (p, true));
 
         let pretty_host = {
             let schema = if is_https { "https://" } else { "http://" };
