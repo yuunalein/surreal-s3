@@ -30,6 +30,7 @@ impl GetTimestamp for AwsPresignedConfig {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct PresignedConfig {
     pub inner: AwsPresignedConfig,
     pub expires_at: String,

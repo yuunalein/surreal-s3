@@ -1,8 +1,8 @@
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use surrealdb_types::{Duration, SurrealValue};
 use surrealism::surrealism;
 
-use crate::{client::client, util::PresignedConfig};
+use crate::{client::AwsClient, util::PresignedConfig};
 
 #[surrealism(comment = "Returns a URI for a PUT action on the specified object")]
 async fn put(
@@ -14,7 +14,7 @@ async fn put(
     async {
         let config = PresignedConfig::new(expires_in)?;
 
-        let uri = client()
+        let uri = AwsClient::new()
             .await?
             .put_object()
             .bucket(bucket)
@@ -32,7 +32,7 @@ async fn put(
         })
     }
     .await
-    .map_err(|e| anyhow::anyhow!("Failed to create presigned PUT URI: {e:#}"))
+    .map_err(|e| anyhow!("Failed to create presigned PUT URI: {e:#}"))
 }
 
 #[surrealism(comment = "Returns a URI for a GET action on the specified object")]
@@ -40,7 +40,7 @@ async fn get(bucket: String, key: String, expires_in: Duration) -> Result<Presig
     async {
         let config = PresignedConfig::new(expires_in)?;
 
-        let uri = client()
+        let uri = AwsClient::new()
             .await?
             .get_object()
             .bucket(bucket)
@@ -57,7 +57,7 @@ async fn get(bucket: String, key: String, expires_in: Duration) -> Result<Presig
         })
     }
     .await
-    .map_err(|e| anyhow::anyhow!("Failed to create presigned GET URI: {e:#}"))
+    .map_err(|e| anyhow!("Failed to create presigned GET URI: {e:#}"))
 }
 
 #[surrealism(comment = "Returns a URI for a HEAD action on the specified object")]
@@ -65,7 +65,7 @@ async fn head(bucket: String, key: String, expires_in: Duration) -> Result<Presi
     async {
         let config = PresignedConfig::new(expires_in)?;
 
-        let uri = client()
+        let uri = AwsClient::new()
             .await?
             .head_object()
             .bucket(bucket)
@@ -82,7 +82,7 @@ async fn head(bucket: String, key: String, expires_in: Duration) -> Result<Presi
         })
     }
     .await
-    .map_err(|e| anyhow::anyhow!("Failed to create presigned HEAD URI: {e:#}"))
+    .map_err(|e| anyhow!("Failed to create presigned HEAD URI: {e:#}"))
 }
 
 #[surrealism(comment = "Returns a URI for a DELETE action on the specified object")]
@@ -90,7 +90,7 @@ async fn delete(bucket: String, key: String, expires_in: Duration) -> Result<Pre
     async {
         let config = PresignedConfig::new(expires_in)?;
 
-        let uri = client()
+        let uri = AwsClient::new()
             .await?
             .delete_object()
             .bucket(bucket)
@@ -107,12 +107,12 @@ async fn delete(bucket: String, key: String, expires_in: Duration) -> Result<Pre
         })
     }
     .await
-    .map_err(|e| anyhow::anyhow!("Failed to create presigned DELETE URI: {e:#}"))
+    .map_err(|e| anyhow!("Failed to create presigned DELETE URI: {e:#}"))
 }
 
 #[derive(SurrealValue)]
-struct PresignedResponse {
-    method: String,
-    uri: String,
-    expires_at: String,
+pub struct PresignedResponse {
+    pub method: String,
+    pub uri: String,
+    pub expires_at: String,
 }

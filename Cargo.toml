@@ -11,10 +11,11 @@ crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = "1"
-aws-config = { version = "1", features = [
-    "rt-tokio",
-], default-features = false }
-aws-sdk-s3 = { version = "1", default-features = false }
+aws-sdk-s3 = { version = "1", default-features = false, features = [
+    "rt-tokio"
+] }
+aws-sigv4 = { version = "1", default-features = false, features = ["sign-http"] }
+aws-smithy-runtime-api = { version = "1", default-features = false, features = ["client"] }
 chrono = "0.4"
 surrealism = "0.7.1"
 surrealdb-types = "4.0.1"
@@ -25,3 +26,4 @@ tokio = { version = "1", default-features = false, features = [
     "sync",
     "time",
 ] }
+url = "2"
